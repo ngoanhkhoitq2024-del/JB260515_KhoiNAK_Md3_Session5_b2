@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import re.edu.md3ss5.dto.CourseResponse;
+import re.edu.md3ss5.dto.CourseResponseV2;
 import re.edu.md3ss5.dto.PageResponse;
 import re.edu.md3ss5.entity.Course;
 import re.edu.md3ss5.entity.CourseStatus;
@@ -17,39 +18,30 @@ import re.edu.md3ss5.repository.CourseRepository;
 public class CourseService {
     private final CourseRepository courseRepository;
 
-    public PageResponse<CourseResponse> getPagedCourses(int page, int size, String sortBy,
+    public PageResponse<CourseResponseV2> getPagedCoursesV2(int page, int size, String sortBy,
             Sort.Direction direction, CourseStatus status) {
         // Safety check
         if (page < 0) {page = 0;}
 
-        // Không truyền sortBy → mặc định sort theo id
         if (sortBy == null || sortBy.isBlank()) {
             sortBy = "id";
         }
 
         Sort sort = Sort.by(direction, sortBy);
-
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        Page<Course> courses = courseRepository.findAllByStatus(status, pageable);
+        // Repository trả về DTO trực tiếp
+        Page<CourseResponseV2> courses =
+                courseRepository.findAllByStatusV2(status, pageable);
 
-        // Map Entity → DTO
-        Page<CourseResponse> courseResponses = courses.map(
-                course -> new CourseResponse(
-                        course.getId(),
-                        course.getName(),
-                        course.getStatus()
-                )
-        );
-
-        // Page<CourseResponse> → PageResponse<CourseResponse>
+        // Đóng gói thành PageResponse
         return new PageResponse<>(
-                courseResponses.getContent(),
-                courseResponses.getNumber(),
-                courseResponses.getSize(),
-                (int) courseResponses.getTotalElements(),
-                courseResponses.getTotalPages(),
-                courseResponses.isLast()
+                courses.getContent(),
+                courses.getNumber(),
+                courses.getSize(),
+                (int) courses.getTotalElements(),
+                courses.getTotalPages(),
+                courses.isLast()
         );
     }
 }

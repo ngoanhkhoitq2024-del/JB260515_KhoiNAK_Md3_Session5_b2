@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import re.edu.md3ss5.dto.ApiResponse;
 import re.edu.md3ss5.dto.CourseResponse;
+import re.edu.md3ss5.dto.CourseResponseV2;
 import re.edu.md3ss5.dto.PageResponse;
 import re.edu.md3ss5.entity.CourseStatus;
 import re.edu.md3ss5.service.CourseService;
@@ -20,16 +21,19 @@ public class CourseController {
     private final CourseService courseService;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<PageResponse<CourseResponse>>> getCourses(
+    public ResponseEntity<ApiResponse<PageResponse<CourseResponseV2>>> getCoursesV2(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String sortBy,
             @RequestParam(defaultValue = "DESC") Sort.Direction direction,
             @RequestParam(defaultValue = "ACTIVE") CourseStatus status
     ) {
-        PageResponse<CourseResponse> result =
-                courseService.getPagedCourses(page, size, sortBy, direction, status);
 
-        return ResponseEntity.ok(new ApiResponse<>(true, "Ok", result));
+        PageResponse<CourseResponseV2> result =
+                courseService.getPagedCoursesV2(page, size, sortBy, direction, status);
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(true, "Ok", result)
+        );
     }
 }
