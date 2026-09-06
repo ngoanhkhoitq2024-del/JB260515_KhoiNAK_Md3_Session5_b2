@@ -6,10 +6,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import re.edu.md3ss5.dto.CourseResponse;
 import re.edu.md3ss5.dto.CourseResponseV2;
 import re.edu.md3ss5.dto.PageResponse;
-import re.edu.md3ss5.entity.Course;
 import re.edu.md3ss5.entity.CourseStatus;
 import re.edu.md3ss5.repository.CourseRepository;
 
@@ -19,20 +17,31 @@ public class CourseService {
     private final CourseRepository courseRepository;
 
     public PageResponse<CourseResponseV2> getPagedCoursesV2(int page, int size, String sortBy,
-            Sort.Direction direction, CourseStatus status) {
+            Sort.Direction direction, CourseStatus status, String keyword) {
         // Safety check
         if (page < 0) {page = 0;}
 
-        if (sortBy == null || sortBy.isBlank()) {
-            sortBy = "id";
+        // Xử lý keyword rỗng
+        if (keyword != null && keyword.isBlank()) {
+            keyword = "";
         }
 
-        Sort sort = Sort.by(direction, sortBy);
-        Pageable pageable = PageRequest.of(page, size, sort);
+        Pageable pageable;
+        // Không có direction → không sắp xếp
+        if (direction == null) {
+            pageable = PageRequest.of(page, size);
+        } else {
+            // Không truyền sortBy → mặc định sort theo id
+            if (sortBy == null || sortBy.isBlank()) {
+                sortBy = "id";
+            }
+            Sort sort = Sort.by(direction, sortBy);
+            pageable = PageRequest.of(page, size, sort);
+        }
 
         // Repository trả về DTO trực tiếp
         Page<CourseResponseV2> courses =
-                courseRepository.findAllByStatusV2(status, pageable);
+                courseRepository.findAllByStatusV2(status, keyword, pageable);
 
         // Đóng gói thành PageResponse
         return new PageResponse<>(

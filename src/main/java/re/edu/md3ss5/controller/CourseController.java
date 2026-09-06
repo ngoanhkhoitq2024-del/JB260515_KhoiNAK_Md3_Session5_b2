@@ -25,12 +25,12 @@ public class CourseController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String sortBy,
-            @RequestParam(defaultValue = "DESC") Sort.Direction direction,
-            @RequestParam(defaultValue = "ACTIVE") CourseStatus status
+            @RequestParam(required = false) Sort.Direction direction,
+            @RequestParam(required = false) CourseStatus status,
+            @RequestParam(required = false) String keyword
     ) {
-
         PageResponse<CourseResponseV2> result =
-                courseService.getPagedCoursesV2(page, size, sortBy, direction, status);
+                courseService.getPagedCoursesV2(page, size, sortBy, direction, status, keyword);
 
         return ResponseEntity.ok(
                 new ApiResponse<>(true, "Ok", result)
