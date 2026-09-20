@@ -1,12 +1,10 @@
 package re.edu.md3ss5.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import re.edu.md3ss5.dto.ApiResponse;
 import re.edu.md3ss5.dto.CourseResponse;
 import re.edu.md3ss5.dto.CourseResponseV2;
@@ -21,19 +19,12 @@ public class CourseController {
     private final CourseService courseService;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<PageResponse<CourseResponseV2>>> getCoursesV2(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
+    public ResponseEntity<ApiResponse<PageResponse<CourseResponse>>> getCourses(
+            @RequestParam(defaultValue ="0") Integer page,
+            @RequestParam(defaultValue = "10") Integer size,
             @RequestParam(required = false) String sortBy,
-            @RequestParam(required = false) Sort.Direction direction,
-            @RequestParam(required = false) CourseStatus status,
-            @RequestParam(required = false) String keyword
-    ) {
-        PageResponse<CourseResponseV2> result =
-                courseService.getPagedCoursesV2(page, size, sortBy, direction, status, keyword);
-
-        return ResponseEntity.ok(
-                new ApiResponse<>(true, "Ok", result)
-        );
+            @RequestParam(defaultValue = "DESC") Sort.Direction direction) {
+        PageResponse<CourseResponse> result = courseService.getPagedCourses(page,size,sortBy,direction);
+        return ResponseEntity.ok(new ApiResponse<>(true, "ok", result));
     }
 }

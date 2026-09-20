@@ -12,6 +12,6 @@ import re.edu.md3ss5.entity.CourseStatus;
 @Setter
 public class CourseResponse {
     private Long id;
-    private String name;
+    private String title;
     private CourseStatus status;
 }
